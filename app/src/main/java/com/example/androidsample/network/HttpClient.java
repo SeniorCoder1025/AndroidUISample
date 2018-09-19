@@ -25,7 +25,7 @@ import cz.msebera.android.httpclient.Header;
 
 public class HttpClient {
 
-    private static final String BASE_URL = "https://mock-api-mobile.dev.lalamove.com/";
+    private static final String BASE_URL = "https://mock-api-mobile.dev.lalamove.coms/";
 
     private static volatile HttpClient INSTANCE;
 
@@ -72,12 +72,12 @@ public class HttpClient {
         }
     }
 
-    public void getDelivers(final HttpResponseHandler<Deliver> responseHandler) {
-        String fullUrl = BASE_URL + "deliveries";
+    public void getDelivers(final int offset, final int limit, final HttpResponseHandler<Deliver> responseHandler) {
+        String fullUrl = BASE_URL + "deliveries?offset=" + offset + "&limit=" + limit;
         mClient.get(fullUrl, new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                responseHandler.onSuccessList(mDatabase.deliverDao().getAll());
+                responseHandler.onSuccessList(mDatabase.deliverDao().getDelivers(offset, limit));
             }
 
             @Override
@@ -85,7 +85,6 @@ public class HttpClient {
                 try {
                     JSONArray array = new JSONArray(responseString);
                     ArrayList<Deliver> responseArray = new ArrayList<>();
-                    mDatabase.deliverDao().deleteAll();
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject object = array.getJSONObject(i);
                         Deliver deliver = new Deliver();
@@ -102,7 +101,7 @@ public class HttpClient {
                     responseHandler.onSuccessList(responseArray);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    responseHandler.onSuccessList(mDatabase.deliverDao().getAll());
+                    responseHandler.onSuccessList(mDatabase.deliverDao().getDelivers(offset, limit));
                 }
             }
         });

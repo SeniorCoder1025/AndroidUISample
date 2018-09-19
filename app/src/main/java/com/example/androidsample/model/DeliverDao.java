@@ -16,6 +16,9 @@ public interface DeliverDao {
     @Query("SELECT * FROM Deliver ORDER BY id ASC")
     List<Deliver> getAll();
 
+    @Query("SELECT * FROM Deliver ORDER BY id ASC LIMIT :limit OFFSET :offset")
+    List<Deliver> getDelivers(int offset, int limit);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(Deliver... delivers);
 
